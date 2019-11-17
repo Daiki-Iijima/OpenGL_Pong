@@ -15,9 +15,26 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
+    <ClCompile Include="Main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="audio.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="font.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Paddle.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Rect.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="audio.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -36,28 +53,5 @@
     <ClInclude Include="Rect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="OpenGL_Pong.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="audio.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Ball.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="font.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Paddle.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Rect.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

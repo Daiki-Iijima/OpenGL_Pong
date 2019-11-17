@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_Pong", "OpenGL_Pong\OpenGL_Pong.vcxproj", "{FB5624E3-CE35-42C5-B442-29480580FF1A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_Pong", "OpenGL_Pong\OpenGL_Pong.vcxproj", "{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,19 +13,19 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FB5624E3-CE35-42C5-B442-29480580FF1A}.Debug|x64.ActiveCfg = Debug|x64
-		{FB5624E3-CE35-42C5-B442-29480580FF1A}.Debug|x64.Build.0 = Debug|x64
-		{FB5624E3-CE35-42C5-B442-29480580FF1A}.Debug|x86.ActiveCfg = Debug|Win32
-		{FB5624E3-CE35-42C5-B442-29480580FF1A}.Debug|x86.Build.0 = Debug|Win32
-		{FB5624E3-CE35-42C5-B442-29480580FF1A}.Release|x64.ActiveCfg = Release|x64
-		{FB5624E3-CE35-42C5-B442-29480580FF1A}.Release|x64.Build.0 = Release|x64
-		{FB5624E3-CE35-42C5-B442-29480580FF1A}.Release|x86.ActiveCfg = Release|Win32
-		{FB5624E3-CE35-42C5-B442-29480580FF1A}.Release|x86.Build.0 = Release|Win32
+		{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}.Debug|x64.ActiveCfg = Debug|x64
+		{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}.Debug|x64.Build.0 = Debug|x64
+		{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}.Debug|x86.ActiveCfg = Debug|Win32
+		{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}.Debug|x86.Build.0 = Debug|Win32
+		{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}.Release|x64.ActiveCfg = Release|x64
+		{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}.Release|x64.Build.0 = Release|x64
+		{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}.Release|x86.ActiveCfg = Release|Win32
+		{505EB7D1-CD15-471A-85A8-BBC560AC6B4C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {BD54AB4A-9019-4A08-B78B-7C4C1C372B31}
+		SolutionGuid = {70CFAF5D-1D1E-4D8C-9396-9EDEC5CE3FE8}
 	EndGlobalSection
 EndGlobal
