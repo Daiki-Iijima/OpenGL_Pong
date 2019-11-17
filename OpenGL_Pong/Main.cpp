@@ -11,7 +11,7 @@
 
 #include "audio.h"
 
-#define	BALL_MAX 2
+#define	PLAYER_MAX 2
 
 using namespace glm;
 
@@ -19,7 +19,7 @@ ivec2 windowSize = { 800,600 };	//	ウィンドウのサイズを定義
 
 bool keys[256];		//	どのキーが押されているかを保持する
 
-Ball balls[BALL_MAX];
+Ball ball{ 8 };
 Paddle paddle;
 
 //	描画が必要になったら
@@ -52,16 +52,14 @@ void display(void)
 		{0xff,0x00,0xff},
 	};
 
-	for (int i = 0; i < BALL_MAX; i++)
-	{
-		glColor3ub(					//	色を設定
-			colors[i % 6][0],
-			colors[i % 6][1],
-			colors[i % 6][2]
-		);
+	glColor3ub(					//	ボールの色を設定
+		colors[3][0],
+		colors[3][1],
+		colors[3][2]
+	);
 
-		balls[i].draw();			//	ボールを描画
-	}
+	ball.draw();				//	ボールを描画
+
 	//	======= 文字列の描画(font.cpp) ======
 
 	fontBegin();
@@ -84,41 +82,39 @@ void display(void)
 
 void idle(void)
 {
-	for (int i = 0; i < BALL_MAX; i++)
+	ball.update();
+
+	if (paddle.intersectBall(ball))
 	{
-		balls[i].update();
-
-		if (paddle.intersectBall(balls[i]))
-		{
-			balls[i].m_position = balls[i].m_lastposition;
-			balls[i].m_speed.x *= -1;
-		}
-
-		if (balls[i].m_position.x >= windowSize.x)
-		{
-			balls[i].m_position = balls[i].m_lastposition;
-			balls[i].m_speed.x = -fabs(balls[i].m_speed.x);	//	絶対値に変換してから、マイナスに変換
-		}
-
-		if (balls[i].m_position.x < 0)
-		{
-			balls[i].m_position = balls[i].m_lastposition;
-			balls[i].m_speed.x = fabs(balls[i].m_speed.x);	//	絶対値に変換
-		}
-
-
-		if (balls[i].m_position.y >= windowSize.y)
-		{
-			balls[i].m_position = balls[i].m_lastposition;
-			balls[i].m_speed.y = -fabs(balls[i].m_speed.y);	//	絶対値に変換してから、マイナスに変換
-		}
-
-		if (balls[i].m_position.y < 0)
-		{
-			balls[i].m_position = balls[i].m_lastposition;
-			balls[i].m_speed.y = fabs(balls[i].m_speed.y);	//	絶対値に変換してから、マイナスに変換
-		}
+		ball.m_position = ball.m_lastposition;
+		ball.m_speed.x *= -1;
 	}
+
+	if (ball.m_position.x >= windowSize.x)
+	{
+		ball.m_position = ball.m_lastposition;
+		ball.m_speed.x = -fabs(ball.m_speed.x);	//	絶対値に変換してから、マイナスに変換
+	}
+
+	if (ball.m_position.x < 0)
+	{
+		ball.m_position = ball.m_lastposition;
+		ball.m_speed.x = fabs(ball.m_speed.x);	//	絶対値に変換
+	}
+
+
+	if (ball.m_position.y >= windowSize.y)
+	{
+		ball.m_position = ball.m_lastposition;
+		ball.m_speed.y = -fabs(ball.m_speed.y);	//	絶対値に変換してから、マイナスに変換
+	}
+
+	if (ball.m_position.y < 0)
+	{
+		ball.m_position = ball.m_lastposition;
+		ball.m_speed.y = fabs(ball.m_speed.y);	//	絶対値に変換してから、マイナスに変換
+	}
+
 
 	audioUpdate();
 
@@ -200,22 +196,20 @@ int main(int argc, char *argv[])
 
 	srand(time(NULL));		//	ランダム用変数を現在の時間で初期化
 
-	for (int i = 0; i < BALL_MAX; i++)
-	{
-		balls[i].m_position =					//	位置を設定
+		ball.m_position =					//	位置を設定
 			vec2(
 				rand() % windowSize.x,			//	x:0~1の乱数で求める 
 				rand() % windowSize.y			//	y:0~1の乱数で求める
 			);
 
-		balls[i].m_speed =						//	ボールのスピードを設定
+		ball.m_speed =						//	ボールのスピードを設定
 			normalize(							//	スピードを一定にするために正規化
 				vec2(
 				(float)rand() / RAND_MAX - .5f,		//	x:0~1の乱数で求める 
 					(float)rand() / RAND_MAX - .5f		//	y:0~1の乱数で求める
 				)
 			);
-	}
+	
 
 	paddle.m_height = 300;
 

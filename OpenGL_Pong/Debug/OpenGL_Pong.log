@@ -1,11 +1,3 @@
-﻿  audio.cpp
-  Ball.cpp
-  font.cpp
-  Main.cpp
+﻿  Main.cpp
 d:\git_ws\opengl_pong\opengl_pong\paddle.h(14): warning C4227: 旧形式が使用されています: 参照の修飾子は無視されます。
-  Paddle.cpp
-d:\git_ws\opengl_pong\opengl_pong\paddle.h(14): warning C4227: 旧形式が使用されています: 参照の修飾子は無視されます。
-d:\git_ws\opengl_pong\opengl_pong\paddle.cpp(29): warning C4227: 旧形式が使用されています: 参照の修飾子は無視されます。
-  Rect.cpp
-  コードを生成中...
   OpenGL_Pong.vcxproj -> D:\Git_ws\OpenGL_Pong\Debug\OpenGL_Pong.exe
