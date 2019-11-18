@@ -20,7 +20,7 @@ ivec2 windowSize = { 800,600 };	//	ウィンドウのサイズを定義
 bool keys[256];		//	どのキーが押されているかを保持する
 
 Ball ball{ 8 };
-Paddle paddle;
+Paddle paddles[PLAYER_MAX];
 
 //	描画が必要になったら
 void display(void)
@@ -41,8 +41,11 @@ void display(void)
 	glLoadIdentity();				//	前回の射影行列が残らないように行列の初期化
 
 	glColor3ub(0xff, 0xff, 0xff);
-	paddle.draw();
 
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		paddles[i].draw();
+	}
 	unsigned char colors[6][3] = {	//	ボールで使用する予定の色パレットを作成
 		{0xff,0x00,0x00},
 		{0x00,0xff,0x00},
@@ -71,7 +74,7 @@ void display(void)
 
 	fontSetPosition(0, y);
 	fontSetWeight(fontGetWeightMax());
-	fontDraw("AA\nBBB\nCCCC\nEEEEE\n");
+	//fontDraw("AA\nBBB\nCCCC\nEEEEE\n");
 
 	fontEnd();
 	//	=====================================
@@ -82,12 +85,32 @@ void display(void)
 
 void idle(void)
 {
+	float paddleSpeed = 7;
+	if (keys['w'])paddles[0].m_position.y -= paddleSpeed;
+	if (keys['s'])paddles[0].m_position.y += paddleSpeed;
+
+	if (keys['i'])paddles[1].m_position.y -= paddleSpeed;
+	if (keys['k'])paddles[1].m_position.y += paddleSpeed;
+
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (paddles[i].m_position.y < 0) { paddles[i].m_position.y = 0; }
+		if (paddles[i].m_position.y > windowSize.y - paddles[i].m_height) { paddles[i].m_position.y = windowSize.y - paddles[i].m_height; }
+	}
+
 	ball.update();
 
-	if (paddle.intersectBall(ball))
+	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		ball.m_position = ball.m_lastposition;
-		ball.m_speed.x *= -1;
+		if (paddles[i].intersectBall(ball))
+		{
+			ball.m_position = ball.m_lastposition;
+			ball.m_speed.x *= -1;
+
+			float paddleCenterY = paddles[i].m_position.y + paddles[i].m_height / 2;
+			float subMax = paddles[i].m_height;
+			ball.m_speed.y = (ball.m_position.y - paddleCenterY) / subMax * 16.0f;
+		}
 	}
 
 	if (ball.m_position.x >= windowSize.x)
@@ -186,7 +209,7 @@ void keybordUp(unsigned char key, int x, int y)
 
 void passiveMotion(int _x, int _y)
 {
-	paddle.m_position = vec2(_x, _y);
+	//paddle.m_position = vec2(_x, _y);
 }
 
 int main(int argc, char *argv[])
@@ -194,24 +217,30 @@ int main(int argc, char *argv[])
 	if (audioInit() != 0)
 		return 1;
 
-	srand(time(NULL));		//	ランダム用変数を現在の時間で初期化
+	float ballSpeed = 5;
+	ball.m_position =					//	位置を設定
+		vec2(
+			windowSize.x,			//	x:0~1の乱数で求める 
+			windowSize.y			//	y:0~1の乱数で求める
+		);
 
-		ball.m_position =					//	位置を設定
-			vec2(
-				rand() % windowSize.x,			//	x:0~1の乱数で求める 
-				rand() % windowSize.y			//	y:0~1の乱数で求める
-			);
+	ball.m_speed =						//	ボールのスピードを設定
+		vec2(
+			ballSpeed,		//	x
+			ballSpeed		//	y
+		);
 
-		ball.m_speed =						//	ボールのスピードを設定
-			normalize(							//	スピードを一定にするために正規化
-				vec2(
-				(float)rand() / RAND_MAX - .5f,		//	x:0~1の乱数で求める 
-					(float)rand() / RAND_MAX - .5f		//	y:0~1の乱数で求める
-				)
-			);
-	
 
-	paddle.m_height = 300;
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		paddles[i].m_height = 32;
+		paddles[i].m_position.y = (windowSize.y - paddles[i].m_height) / 2;
+	}
+
+	paddles[0].m_position.x = 100;
+	paddles[1].m_position.x = windowSize.x - 100;
+
+
 
 	glutInit(&argc, argv);
 

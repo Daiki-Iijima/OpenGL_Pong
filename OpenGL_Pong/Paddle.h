@@ -7,8 +7,8 @@ using namespace glm;
 
 struct Paddle
 {
-	vec2 m_position;
 	float m_height;
+	vec2 m_position;
 
 	void draw();
 	bool intersectBall(Ball &const _ball);		//	ƒ{[ƒ‹‚Æ‚Ì“–‚½‚è”»’è‚ğ‚Æ‚é
