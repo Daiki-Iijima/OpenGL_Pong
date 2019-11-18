@@ -40,6 +40,32 @@ void display(void)
 	glMatrixMode(GL_MODELVIEW);		//	モデルビュー行列モードに切り替え
 	glLoadIdentity();				//	前回の射影行列が残らないように行列の初期化
 
+	//	======	センターラインの描画 ========
+	{
+		GLfloat range[2];					//	線の太さを保存(0:最小 1:最大)
+		glGetFloatv(						//	ラインの太さの最小最大値を取得
+			GL_LINE_WIDTH_RANGE,		//	取得したいt対象(ラインの太さの幅)
+			range						//	取得した値を代入する
+		);
+		glLineWidth(range[1] / 2);			//	線の太さを指定
+		glPushAttrib(GL_ALL_ATTRIB_BITS);	//	今まで設定されていた属性を退避保存
+		glEnable(GL_LINE_STIPPLE);			//	点線を有効にする
+		glLineStipple(						//	点線の設定
+			range[1],					//	一つの点の長さ
+			0x5555						//	点線のパターンを設定	
+		);
+		glBegin(GL_LINES);					//	線を描画開始
+		{
+			for (int i = 0; i < 2; i++)		//	(GL_LINES)で頂点を2つ設定する必要があるため
+			{
+				glVertex2f(windowSize.x / 2, windowSize.y * i);		//	頂点を設定	
+			}
+		}
+		glEnd();							//	描画終了
+		glPopAttrib();						//	退避保存していた属性を元に戻す
+	}
+	//	=====================================
+
 	glColor3ub(0xff, 0xff, 0xff);
 
 	for (int i = 0; i < PLAYER_MAX; i++)
