@@ -21,6 +21,8 @@ bool keys[256];		//	どのキーが押されているかを保持する
 
 Ball ball{ 8 };
 Paddle paddles[PLAYER_MAX];
+int scores[PLAYER_MAX];
+int wait;
 
 //	描画が必要になったら
 void display(void)
@@ -66,13 +68,7 @@ void display(void)
 	}
 	//	=====================================
 
-	glColor3ub(0xff, 0xff, 0xff);
-
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		paddles[i].draw();
-	}
-	unsigned char colors[6][3] = {	//	ボールで使用する予定の色パレットを作成
+	unsigned char colors[6][3] = {			//	ボールで使用する予定の色パレットを作成
 		{0xff,0x00,0x00},
 		{0x00,0xff,0x00},
 		{0x00,0x00,0xff},
@@ -81,27 +77,33 @@ void display(void)
 		{0xff,0x00,0xff},
 	};
 
-	glColor3ub(					//	ボールの色を設定
+	glColor3ub(								//	ボールの色を設定
 		colors[3][0],
 		colors[3][1],
 		colors[3][2]
 	);
 
-	ball.draw();				//	ボールを描画
+	ball.draw();							//	ボールを描画
+
+	glColor3ub(0xff, 0xff, 0xff);
+
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		paddles[i].draw();					//	パドルの描画
+	}
 
 	//	======= 文字列の描画(font.cpp) ======
 
 	fontBegin();
-	fontSetColor(0, 0xff, 0);
-	fontSetSize(FONT_DEFAULT_SIZE);
+	fontSetHeight(FONT_DEFAULT_HEIGHT);
 
-	float lineHeight = fontGetSize() * 1.5;
-	float y = fontGetWeight() / 2;
-
-	fontSetPosition(0, y);
-	fontSetWeight(fontGetWeightMax());
-	//fontDraw("AA\nBBB\nCCCC\nEEEEE\n");
-
+	float y = fontGetWeight();
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		fontSetPosition(windowSize.x / 4 - 80 + windowSize.x / 2 * i, y);
+		fontSetWeight(fontGetWeightMax());
+		fontDraw("%2d", scores[i]);
+	}
 	fontEnd();
 	//	=====================================
 
@@ -111,6 +113,9 @@ void display(void)
 
 void idle(void)
 {
+	if (wait > 0)
+		wait--;
+
 	float paddleSpeed = 7;
 	if (keys['w'])paddles[0].m_position.y -= paddleSpeed;
 	if (keys['s'])paddles[0].m_position.y += paddleSpeed;
@@ -124,7 +129,6 @@ void idle(void)
 		if (paddles[i].m_position.y > windowSize.y - paddles[i].m_height) { paddles[i].m_position.y = windowSize.y - paddles[i].m_height; }
 	}
 
-	ball.update();
 
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
@@ -139,31 +143,53 @@ void idle(void)
 		}
 	}
 
-	if (ball.m_position.x >= windowSize.x)
-	{
-		ball.m_position = ball.m_lastposition;
-		ball.m_speed.x = -fabs(ball.m_speed.x);	//	絶対値に変換してから、マイナスに変換
+	if (wait <= 0) {
+
+		ball.update();								//	ボールの位置更新
+
+	//	======	得点処理 ======
+		if ((ball.m_position.x < 0) ||				//	ボール位置が右端か左端になったら
+			(ball.m_position.x >= windowSize.x))
+		{
+			if (ball.m_position.x < 0)
+				scores[1] ++;
+			else
+				scores[0] ++;
+
+			ball.m_position.x = windowSize.x / 2;	//	ボール位置を画面中央に移動
+			ball.m_lastposition = ball.m_position;	//	ボール最終位置を中央に初期化
+
+			wait = 60;								//	
+
+		}
+		//	======================
+
+		//	====== ボールの画面端の反射処理 =======
+		if (ball.m_position.x >= windowSize.x)		//	右端
+		{
+			ball.m_position = ball.m_lastposition;
+			ball.m_speed.x = -fabs(ball.m_speed.x);
+		}
+
+		if (ball.m_position.x < 0)					//	左端
+		{
+			ball.m_position = ball.m_lastposition;
+			ball.m_speed.x = fabs(ball.m_speed.x);
+		}
+
+		if (ball.m_position.y >= windowSize.y)		//	下端
+		{
+			ball.m_position = ball.m_lastposition;
+			ball.m_speed.y = -fabs(ball.m_speed.y);
+		}
+
+		if (ball.m_position.y < 0)					//	上端
+		{
+			ball.m_position = ball.m_lastposition;
+			ball.m_speed.y = fabs(ball.m_speed.y);
+		}
+		//	======================================
 	}
-
-	if (ball.m_position.x < 0)
-	{
-		ball.m_position = ball.m_lastposition;
-		ball.m_speed.x = fabs(ball.m_speed.x);	//	絶対値に変換
-	}
-
-
-	if (ball.m_position.y >= windowSize.y)
-	{
-		ball.m_position = ball.m_lastposition;
-		ball.m_speed.y = -fabs(ball.m_speed.y);	//	絶対値に変換してから、マイナスに変換
-	}
-
-	if (ball.m_position.y < 0)
-	{
-		ball.m_position = ball.m_lastposition;
-		ball.m_speed.y = fabs(ball.m_speed.y);	//	絶対値に変換してから、マイナスに変換
-	}
-
 
 	audioUpdate();
 
@@ -246,14 +272,14 @@ int main(int argc, char *argv[])
 	float ballSpeed = 5;
 	ball.m_position =					//	位置を設定
 		vec2(
-			windowSize.x,			//	x:0~1の乱数で求める 
-			windowSize.y			//	y:0~1の乱数で求める
+			windowSize.x / 2,			//	x : 画面中央
+			windowSize.y / 2			//	y : 画面中央
 		);
 
 	ball.m_speed =						//	ボールのスピードを設定
 		vec2(
-			ballSpeed,		//	x
-			ballSpeed		//	y
+			ballSpeed,					//	x
+			ballSpeed					//	y
 		);
 
 

@@ -9,11 +9,11 @@
 using namespace glm;
 
 static vec2 position;
-static float size = FONT_DEFAULT_SIZE;
-
-static unsigned char color[3];
-
+static float height = FONT_DEFAULT_HEIGHT;
 static float weight = 1;
+
+//static unsigned char color[3];
+
 
 void fontBegin()
 {
@@ -55,14 +55,14 @@ void fontSetPosition(float _x, float _y)
 	position = vec2(_x, _y);
 }
 
-void fontSetSize(float _size)
+void fontSetHeight(float _height)
 {
-	size = _size;
+	height = _height;
 }
 
-float fontGetSize()
+float fontGetHeight()
 {
-	return size;
+	return height;
 }
 
 float fontGetWeightMin()
@@ -97,12 +97,12 @@ float fontGetWeight()
 	return weight;
 }
 
-void fontSetColor(unsigned char _red, unsigned char _green, unsigned char _blue)
-{
-	color[0] = _red;
-	color[1] = _green;
-	color[2] = _blue;
-}
+//void fontSetColor(unsigned char _red, unsigned char _green, unsigned char _blue)
+//{
+//	color[0] = _red;
+//	color[1] = _green;
+//	color[2] = _blue;
+//}
 
 void fontDraw(const char *_format, ...)
 {
@@ -117,30 +117,30 @@ void fontDraw(const char *_format, ...)
 		argList
 	);
 
-	glLineWidth(weight);		//	線の太さを設定
+	glLineWidth(weight);									//	線の太さを設定
 
 	va_end(argList);
 
-	glColor3ub(color[0], color[1], color[2]);	//	フォントの色を変更
+	//glColor3ub(color[0], color[1], color[2]);				//	フォントの色を変更
 
 	char* p = str;
 
-	glPushMatrix();						//	位置、大きさ(上下反転)を変更したいので行列を保存 
+	glPushMatrix();											//	位置、大きさ(上下反転)を変更したいので行列を保存 
 	{
-		glTranslatef(position.x, position.y + size, 0);		//	位置を変更
-		float s = size / FONT_DEFAULT_SIZE;
+		glTranslatef(position.x, position.y + height, 0);	//	位置を変更
+		float s = height / FONT_DEFAULT_HEIGHT;
 		glScalef(s, -s, s);									//	大きさを変更
 
 		for (; *p != '\0' && *p != '\n'; p++)				//	*pが\0(空文字)か\n(改行コード)の場合ループを終わる
 			glutStrokeCharacter(GLUT_STROKE_ROMAN, *p);		//	文字を描く
 
 	}
-	glPopMatrix();						//	元に戻す
+	glPopMatrix();											//	元に戻す
 
-	if (*p == '\n')	//	改行コードで終了していた場合
+	if (*p == '\n')											//	改行コードで終了していた場合
 	{
-		glTranslatef(0, size + weight * 2, 0);	//	文字描画位置を下にずらす
-		fontDraw(++p);				//	再度描画命令を出す(再帰処理)
+		glTranslatef(0, height + weight * 2, 0);			//	文字描画位置を下にずらす
+		fontDraw(++p);										//	再度描画命令を出す(再帰処理)
 	}
 }
 
