@@ -149,6 +149,11 @@ void idle(void)
 		{
 			if (paddles[i].intersectBall(ball))
 			{
+
+				audioDecay(.9f);			//	音を減衰させる(フェードアウト)
+				audioFreq(440 * 2);			//	音階の設定
+				audioPlay();				//	音の再生
+
 				ball.m_position = ball.m_lastposition;
 				ball.m_speed.x *= -1;
 
@@ -160,7 +165,7 @@ void idle(void)
 		// ========================================
 	}
 
-	
+
 
 	if (wait <= 0) {	//	待機時間が経過していたら
 
@@ -171,6 +176,12 @@ void idle(void)
 			(ball.m_position.x >= windowSize.x))
 		{
 			if (started) {				//	ゲームが始まっていれば得点処理を行う
+
+				audioLength(1000);
+				audioDecay(0);			//	音を減衰させる(フェードアウト)
+				audioFreq(440 / 4);				//	音階の設定
+				audioPlay();				//	音の再生
+
 				if (ball.m_position.x < 0)
 					scores[1] ++;
 				else
@@ -196,17 +207,20 @@ void idle(void)
 			ball.m_speed.x = fabs(ball.m_speed.x);
 		}
 
-		if (ball.m_position.y >= windowSize.y)		//	下端
+		if ((ball.m_position.y >= windowSize.y) ||	// 下端 or 上端
+			(ball.m_position.y < 0))
 		{
+			if (started)
+			{
+				audioDecay(.9f);			//	音を減衰させる(フェードアウト)
+				audioFreq(440);				//	音階の設定
+				audioPlay();				//	音の再生
+			}
+
 			ball.m_position = ball.m_lastposition;
-			ball.m_speed.y = -fabs(ball.m_speed.y);
+			ball.m_speed.y *= -1;
 		}
 
-		if (ball.m_position.y < 0)					//	上端
-		{
-			ball.m_position = ball.m_lastposition;
-			ball.m_speed.y = fabs(ball.m_speed.y);
-		}
 		//	======================================
 	}
 
@@ -265,13 +279,13 @@ void keybord(unsigned char key, int x, int y)
 
 		//	===== ボールの位置を初期化 =====
 		ball.m_position = ball.m_lastposition = vec2(windowSize.x, windowSize.y) / 2.f;	//	ボール位置、最終位置を画面中央に移動
-		
+
 		//	===== 得点の初期化 =====
 		for (int i = 0; i < PLAYER_MAX; i++)
 		{
 			scores[i] = 0;
 		}
-																						
+
 		//	================================
 
 		wait = 180;								//	最初の待機時間を設定(180 = 約3秒)
