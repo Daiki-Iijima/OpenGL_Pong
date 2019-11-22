@@ -12,6 +12,7 @@
 #include "audio.h"
 
 #define	PLAYER_MAX 2
+#define SCORE_MAX 11
 
 using namespace glm;
 
@@ -23,6 +24,7 @@ Ball ball{ 8 };
 Paddle paddles[PLAYER_MAX];
 int scores[PLAYER_MAX];
 int wait;
+bool started;
 
 //	描画が必要になったら
 void display(void)
@@ -87,11 +89,13 @@ void display(void)
 
 	glColor3ub(0xff, 0xff, 0xff);
 
-	for (int i = 0; i < PLAYER_MAX; i++)
+	if (started)			//	ゲームが開始されていればパドルを描画
 	{
-		paddles[i].draw();					//	パドルの描画
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			paddles[i].draw();					//	パドルの描画
+		}
 	}
-
 	//	======= 文字列の描画(font.cpp) ======
 
 	fontBegin();
@@ -111,56 +115,71 @@ void display(void)
 	//glFlush();			//	シングルバッファの場合
 }
 
+//	アップデートみたいなもの
 void idle(void)
 {
-	if (wait > 0)
-		wait--;
-
-	float paddleSpeed = 7;
-	if (keys['w'])paddles[0].m_position.y -= paddleSpeed;
-	if (keys['s'])paddles[0].m_position.y += paddleSpeed;
-
-	if (keys['i'])paddles[1].m_position.y -= paddleSpeed;
-	if (keys['k'])paddles[1].m_position.y += paddleSpeed;
-
-	for (int i = 0; i < PLAYER_MAX; i++)
+	if (started)	//	開始していたら
 	{
-		if (paddles[i].m_position.y < 0) { paddles[i].m_position.y = 0; }
-		if (paddles[i].m_position.y > windowSize.y - paddles[i].m_height) { paddles[i].m_position.y = windowSize.y - paddles[i].m_height; }
-	}
-
-
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		if (paddles[i].intersectBall(ball))
+		if (wait > 0)
 		{
-			ball.m_position = ball.m_lastposition;
-			ball.m_speed.x *= -1;
+			wait--;
 
-			float paddleCenterY = paddles[i].m_position.y + paddles[i].m_height / 2;
-			float subMax = paddles[i].m_height;
-			ball.m_speed.y = (ball.m_position.y - paddleCenterY) / subMax * 16.0f;
+			if ((wait <= 0)
+				&& ((scores[0] >= SCORE_MAX) ||
+				(scores[1] >= SCORE_MAX)))
+			{
+				started = false;
+			}
 		}
+		//	=============	パドル処理 =============
+		float paddleSpeed = 7;
+		if (keys['w'])paddles[0].m_position.y -= paddleSpeed;
+		if (keys['s'])paddles[0].m_position.y += paddleSpeed;
+
+		if (keys['i'])paddles[1].m_position.y -= paddleSpeed;
+		if (keys['k'])paddles[1].m_position.y += paddleSpeed;
+
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			if (paddles[i].m_position.y < 0) { paddles[i].m_position.y = 0; }
+			if (paddles[i].m_position.y > windowSize.y - paddles[i].m_height) { paddles[i].m_position.y = windowSize.y - paddles[i].m_height; }
+		}
+
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			if (paddles[i].intersectBall(ball))
+			{
+				ball.m_position = ball.m_lastposition;
+				ball.m_speed.x *= -1;
+
+				float paddleCenterY = paddles[i].m_position.y + paddles[i].m_height / 2;
+				float subMax = paddles[i].m_height;
+				ball.m_speed.y = (ball.m_position.y - paddleCenterY) / subMax * 16.0f;
+			}
+		}
+		// ========================================
 	}
 
-	if (wait <= 0) {
+	
+
+	if (wait <= 0) {	//	待機時間が経過していたら
 
 		ball.update();								//	ボールの位置更新
 
-	//	======	得点処理 ======
+		//	======	得点処理 ======
 		if ((ball.m_position.x < 0) ||				//	ボール位置が右端か左端になったら
 			(ball.m_position.x >= windowSize.x))
 		{
-			if (ball.m_position.x < 0)
-				scores[1] ++;
-			else
-				scores[0] ++;
+			if (started) {				//	ゲームが始まっていれば得点処理を行う
+				if (ball.m_position.x < 0)
+					scores[1] ++;
+				else
+					scores[0] ++;
 
-			ball.m_position.x = windowSize.x / 2;	//	ボール位置を画面中央に移動
-			ball.m_lastposition = ball.m_position;	//	ボール最終位置を中央に初期化
+				ball.m_position = ball.m_lastposition = vec2(windowSize.x, windowSize.y) / 2.f;	//	ボール位置、最終位置を画面中央に移動
 
-			wait = 60;								//	
-
+				wait = 60;								//	待機時間を設定(60 = 約1秒)
+			}
 		}
 		//	======================
 
@@ -232,6 +251,33 @@ void keybord(unsigned char key, int x, int y)
 		break;
 	}
 
+	if (!started)	//	何かしらキーが押されたらゲーム開始
+	{
+		//	====== パドルの初期設定 ======
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			paddles[i].m_height = 32;
+			paddles[i].m_position.y = (windowSize.y - paddles[i].m_height) / 2;
+		}
+
+		paddles[0].m_position.x = 100;
+		paddles[1].m_position.x = windowSize.x - 100;
+
+		//	===== ボールの位置を初期化 =====
+		ball.m_position = ball.m_lastposition = vec2(windowSize.x, windowSize.y) / 2.f;	//	ボール位置、最終位置を画面中央に移動
+		
+		//	===== 得点の初期化 =====
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			scores[i] = 0;
+		}
+																						
+		//	================================
+
+		wait = 180;								//	最初の待機時間を設定(180 = 約3秒)
+		started = true;
+	}
+
 	//if ((key >= '1') && (key <= '5'))
 	//{
 	//	audioWaveform(key - '1');	//	1～5キーで波形を切り替える
@@ -283,14 +329,7 @@ int main(int argc, char *argv[])
 		);
 
 
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		paddles[i].m_height = 32;
-		paddles[i].m_position.y = (windowSize.y - paddles[i].m_height) / 2;
-	}
 
-	paddles[0].m_position.x = 100;
-	paddles[1].m_position.x = windowSize.x - 100;
 
 
 
